@@ -1,8 +1,9 @@
-import { Control } from "react-hook-form";
-import { IFormLogin } from "../../pages/Login/types";
+import { Control, FieldValues, Path } from "react-hook-form";
 
-export interface IInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    control: Control<IFormLogin, any>   
-    name: "email" | "password";
-    errorMessage?: string;
+export interface IInputProps<TFieldValues extends FieldValues>
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  name: Path<TFieldValues>;
+  control: Control<TFieldValues>;
+  errorMessage?: string;
 }
