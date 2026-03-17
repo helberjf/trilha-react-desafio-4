@@ -1,64 +1,90 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { authService } from "../services/auth/authService";
+import {
+  AuthContextValue,
+  AuthCredentials,
+  AuthenticatedUser,
+  AuthStatus,
+} from "../types/auth";
 
-interface IUser {
-  name: string;
-  email: string;
-}
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-interface IAuthContext {
-  user: IUser | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-}
-
-interface IAuthProviderProps {
-  children: React.ReactNode;
-}
-
-const STORAGE_KEY = "@trilha-react-desafio-4:user";
-
-const AuthContext = createContext({} as IAuthContext);
-
-export function AuthProvider({ children }: IAuthProviderProps) {
-  const [user, setUser] = useState<IUser | null>(null);
+export function AuthProvider({ children }: PropsWithChildren) {
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const [status, setStatus] = useState<AuthStatus>("loading");
+  const [error, setError] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem(STORAGE_KEY);
+    const storedUser = authService.getStoredUser();
 
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (storedUser) {
+      setUser(storedUser);
+      setStatus("authenticated");
+      return;
     }
+
+    setStatus("unauthenticated");
   }, []);
 
-  const login = async (email: string, password: string) => {
-    // autenticação mockada para o desafio
-    if (email === "admin@dio.com" && password === "123456") {
-      const loggedUser = {
-        name: "Helber",
-        email,
-      };
+  const login = async (credentials: AuthCredentials) => {
+    setError(null);
+    setIsAuthenticating(true);
 
-      setUser(loggedUser);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(loggedUser));
+    try {
+      const authenticatedUser = await authService.login(credentials);
+
+      setUser(authenticatedUser);
+      setStatus("authenticated");
+      authService.persistUser(authenticatedUser);
+
       return true;
-    }
+    } catch (loginError) {
+      setUser(null);
+      setStatus("unauthenticated");
+      authService.clearStoredUser();
 
-    return false;
+      if (authService.isInvalidCredentialsError(loginError)) {
+        setError("Credenciais invalidas. Use os dados de teste para acessar.");
+      } else {
+        setError("Nao foi possivel concluir o login. Tente novamente.");
+      }
+
+      return false;
+    } finally {
+      setIsAuthenticating(false);
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
+    setError(null);
+    setStatus("unauthenticated");
+    authService.clearStoredUser();
+  };
+
+  const clearError = () => {
+    setError(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        status,
+        error,
+        isAuthenticated: status === "authenticated" && !!user,
+        isInitializing: status === "loading",
+        isAuthenticating,
         login,
         logout,
+        clearError,
       }}
     >
       {children}
@@ -67,5 +93,11 @@ export function AuthProvider({ children }: IAuthProviderProps) {
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth precisa ser usado dentro de AuthProvider.");
+  }
+
+  return context;
 }

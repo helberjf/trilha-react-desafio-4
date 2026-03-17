@@ -1,46 +1,99 @@
-# Getting Started with Create React App
+# Auth Flow Showcase
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplicacao React + TypeScript focada em demonstrar um fluxo de autenticacao front-end bem organizado sobre uma base pequena, sem reescrever o projeto do zero.
 
-## Available Scripts
+O projeto evolui um desafio funcional para uma entrega mais forte de portfolio, com separacao de responsabilidades, rota privada previsivel, persistencia de sessao e cobertura de testes para o fluxo principal.
 
-In the project directory, you can run:
+## Funcionalidades
 
-### `npm start`
+- Login com validacao de formulario usando `react-hook-form` + `yup`
+- Autenticacao mockada organizada em camada de servico
+- Contexto global de autenticacao com tipagem mais solida
+- Persistencia de sessao com `localStorage`
+- Rota privada com tratamento de hidratacao inicial
+- Home protegida com informacoes do usuario autenticado
+- Logout com limpeza de sessao
+- Testes automatizados dos cenarios mais importantes
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Tecnologias
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- React 18
+- TypeScript
+- React Router DOM v6
+- React Hook Form
+- Yup
+- Styled Components
+- Create React App
+- Testing Library
 
-### `npm test`
+## Arquitetura resumida
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+O projeto continua simples por escolha de escopo, mas foi organizado para ficar mais legivel e evolutivo:
 
-### `npm run build`
+- [`src/contexts/AuthContext.tsx`](./src/contexts/AuthContext.tsx): estado global da sessao, loading inicial, erros e acoes de login/logout
+- [`src/services/auth/authService.ts`](./src/services/auth/authService.ts): autenticacao mockada, persistencia e normalizacao do fluxo de auth
+- [`src/routes/AppRoutes.tsx`](./src/routes/AppRoutes.tsx): definicao central das rotas
+- [`src/routes/PrivateRoute.tsx`](./src/routes/PrivateRoute.tsx): protecao da Home com espera pela hidratacao inicial
+- [`src/pages/Login`](./src/pages/Login): formulario, validacao e feedbacks de UX
+- [`src/pages/Home`](./src/pages/Home): painel protegido com apresentacao mais profissional
+- [`src/test-utils/renderApp.tsx`](./src/test-utils/renderApp.tsx): helper para testes com providers e rotas
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Como rodar localmente
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Instale as dependencias
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm install
+```
 
-### `npm run eject`
+### 2. Inicie o projeto
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm start
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Aplicacao disponivel em `http://localhost:3000`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 3. Execute os testes
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+npm run test:ci
+```
 
-## Learn More
+### 4. Gere o build de producao
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Credenciais de teste
+
+- E-mail: `admin@dio.com`
+- Senha: `123456`
+
+## Fluxos cobertos por teste
+
+- Renderizacao da tela de login
+- Validacao de e-mail e senha
+- Login com sucesso
+- Login com falha
+- Protecao de rota privada sem sessao ativa
+
+## Decisoes e trade-offs
+
+- A autenticacao continua mockada para manter o foco no front-end e preservar a base original
+- A camada de servico foi introduzida para evitar regra hardcoded dentro do contexto
+- `localStorage` foi mantido por compatibilidade, mas agora com responsabilidade mais bem delimitada
+- O projeto segue em CRA por requisito do desafio e para evitar migracao desnecessaria
+
+## Melhorias futuras
+
+- Integrar com API real e refresh token
+- Adicionar testes para reidratacao de sessao e logout
+- Criar feedback visual para estados globais de erro e carregamento
+- Introduzir temas e tokens de design compartilhados por pagina
+- Adicionar pipeline de CI para executar testes e build automaticamente
+
+## Valor de portfolio
+
+Esta base mostra uma habilidade importante para contextos reais: pegar um projeto pequeno que ja funciona, identificar os pontos de fragilidade e melhora-lo com criterio tecnico, sem cair na armadilha de reescrever tudo do zero.

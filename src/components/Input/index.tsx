@@ -17,7 +17,13 @@ function Input<TFieldValues extends FieldValues>({
         name={name}
         control={control}
         render={({ field }) => (
-          <InputField id={String(name)} {...field} {...rest} />
+          <InputField
+            id={String(name)}
+            $hasError={!!errorMessage}
+            aria-invalid={!!errorMessage}
+            {...field}
+            {...rest}
+          />
         )}
       />
 

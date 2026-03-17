@@ -1,7 +1,6 @@
-export interface IFormLogin {
-  email: string;
-  password: string;
-}
+import { AuthCredentials } from "../../types/auth";
+
+export type IFormLogin = AuthCredentials;
 
 export const defaultValues: IFormLogin = {
   email: "",
