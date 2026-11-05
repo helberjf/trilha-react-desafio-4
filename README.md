@@ -1,99 +1,56 @@
 # Auth Flow Showcase
 
-Aplicacao React + TypeScript focada em demonstrar um fluxo de autenticacao front-end bem organizado sobre uma base pequena, sem reescrever o projeto do zero.
+A **React + TypeScript** learning project demonstrating a complete frontend login flow with **mock authentication**. It builds on the [Digital Innovation One React challenge](https://github.com/digitalinnovationone/trilha-react-desafio-4), retaining Create React App while organizing session handling and route behavior.
 
-O projeto evolui um desafio funcional para uma entrega mais forte de portfolio, com separacao de responsabilidades, rota privada previsivel, persistencia de sessao e cobertura de testes para o fluxo principal.
+This is a client-side demonstration: its route guard is not backend authorization.
 
-## Funcionalidades
+## What is implemented
 
-- Login com validacao de formulario usando `react-hook-form` + `yup`
-- Autenticacao mockada organizada em camada de servico
-- Contexto global de autenticacao com tipagem mais solida
-- Persistencia de sessao com `localStorage`
-- Rota privada com tratamento de hidratacao inicial
-- Home protegida com informacoes do usuario autenticado
-- Logout com limpeza de sessao
-- Testes automatizados dos cenarios mais importantes
+- Login validation with React Hook Form and Yup.
+- Mock credentials and normalized login behavior in a dedicated service.
+- Typed authentication context with initial hydration, error state and login/logout actions.
+- `localStorage` persistence and a private-route loading boundary.
+- A signed-in home screen and Testing Library coverage for core login/navigation cases.
 
-## Tecnologias
-
-- React 18
-- TypeScript
-- React Router DOM v6
-- React Hook Form
-- Yup
-- Styled Components
-- Create React App
-- Testing Library
-
-## Arquitetura resumida
-
-O projeto continua simples por escolha de escopo, mas foi organizado para ficar mais legivel e evolutivo:
-
-- [`src/contexts/AuthContext.tsx`](./src/contexts/AuthContext.tsx): estado global da sessao, loading inicial, erros e acoes de login/logout
-- [`src/services/auth/authService.ts`](./src/services/auth/authService.ts): autenticacao mockada, persistencia e normalizacao do fluxo de auth
-- [`src/routes/AppRoutes.tsx`](./src/routes/AppRoutes.tsx): definicao central das rotas
-- [`src/routes/PrivateRoute.tsx`](./src/routes/PrivateRoute.tsx): protecao da Home com espera pela hidratacao inicial
-- [`src/pages/Login`](./src/pages/Login): formulario, validacao e feedbacks de UX
-- [`src/pages/Home`](./src/pages/Home): painel protegido com apresentacao mais profissional
-- [`src/test-utils/renderApp.tsx`](./src/test-utils/renderApp.tsx): helper para testes com providers e rotas
-
-## Como rodar localmente
-
-### 1. Instale as dependencias
+## Run and verify
 
 ```bash
-npm install
-```
-
-### 2. Inicie o projeto
-
-```bash
+npm ci
 npm start
 ```
 
-Aplicacao disponivel em `http://localhost:3000`.
-
-### 3. Execute os testes
+Open `http://localhost:3000`. Use the intentionally public **local demo credentials** exported as `AUTH_TEST_CREDENTIALS` in [authService.ts](src/services/auth/authService.ts); they are mock data, not an external account.
 
 ```bash
 npm run test:ci
-```
-
-### 4. Gere o build de producao
-
-```bash
 npm run build
 ```
 
-## Credenciais de teste
+The commands exist in [package.json](package.json). [Login tests](src/pages/Login/index.test.tsx) cover rendering, validation and invalid credentials; [route tests](src/routes/AppRoutes.test.tsx) cover successful login and redirecting an unauthenticated user. Test files establish intended coverage, not a claim that a particular run passed.
 
-- E-mail: `admin@dio.com`
-- Senha: `123456`
+## Code tour
 
-## Fluxos cobertos por teste
+1. [authService](src/services/auth/authService.ts) — mock lookup, email normalization, stored-user shape checking and persistence.
+2. [AuthContext](src/contexts/AuthContext.tsx) — session state and actions exposed to the UI.
+3. [PrivateRoute](src/routes/PrivateRoute.tsx) and [AppRoutes](src/routes/AppRoutes.tsx) — hydration and routing.
+4. [Login](src/pages/Login/index.tsx) and [Home](src/pages/Home/index.tsx) — user-facing flow.
+5. [renderApp](src/test-utils/renderApp.tsx) — shared provider/router test setup.
 
-- Renderizacao da tela de login
-- Validacao de e-mail e senha
-- Login com sucesso
-- Login com falha
-- Protecao de rota privada sem sessao ativa
+## Documented decisions and tradeoffs
 
-## Decisoes e trade-offs
+The original project notes record these scope decisions:
 
-- A autenticacao continua mockada para manter o foco no front-end e preservar a base original
-- A camada de servico foi introduzida para evitar regra hardcoded dentro do contexto
-- `localStorage` foi mantido por compatibilidade, mas agora com responsabilidade mais bem delimitada
-- O projeto segue em CRA por requisito do desafio e para evitar migracao desnecessaria
+| Decision | Benefit | Boundary |
+| --- | --- | --- |
+| Keep authentication mocked | Focuses the exercise on frontend behavior and preserves the challenge base | No server identity verification, secure session lifecycle or refresh-token integration. |
+| Put authentication behind a service | Keeps lookup/persistence details out of the context | A real provider still needs a defined API contract and error mapping. |
+| Retain localStorage | Makes reload persistence simple and compatible with the original exercise | Browser-editable data is not trusted authorization; a production session design would differ. |
+| Retain Create React App | Avoids a toolchain migration unrelated to the challenge | Carries the existing toolchain constraints rather than adopting a new build setup. |
 
-## Melhorias futuras
+## Next improvements
 
-- Integrar com API real e refresh token
-- Adicionar testes para reidratacao de sessao e logout
-- Criar feedback visual para estados globais de erro e carregamento
-- Introduzir temas e tokens de design compartilhados por pagina
-- Adicionar pipeline de CI para executar testes e build automaticamente
+Add focused tests for logout, valid and corrupted stored sessions, and hydration timing. A real API, server-enforced authorization and a suitable session strategy would be a separate integration step. Shared visual tokens and CI are also documented extension points.
 
-## Valor de portfolio
+## Attribution
 
-Esta base mostra uma habilidade importante para contextos reais: pegar um projeto pequeno que ja funciona, identificar os pontos de fragilidade e melhora-lo com criterio tecnico, sem cair na armadilha de reescrever tudo do zero.
+Forked from **Digital Innovation One's `trilha-react-desafio-4`**. This version documents and organizes the mock service, typed context, hydration-aware routing and tests while preserving the learning origin.
